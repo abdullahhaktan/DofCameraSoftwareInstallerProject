@@ -1,0 +1,5 @@
+﻿bin/
+obj/
+*.log
+.vs/
+node_modules/

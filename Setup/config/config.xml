@@ -1,0 +1,7 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Configuration>
+  <ListenIP>192.168.214.223</ListenIP>
+  <Port>5168</Port>
+  <SleepTime>500</SleepTime>
+  <!-- Sleep time in milliseconds -->
+</Configuration>

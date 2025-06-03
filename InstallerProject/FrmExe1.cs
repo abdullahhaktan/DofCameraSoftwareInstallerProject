@@ -1,0 +1,245 @@
+﻿using Microsoft.Win32;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Diagnostics;
+using System.Drawing;
+using System.IO;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
+using IWshRuntimeLibrary;
+using System.Configuration;
+
+
+
+namespace InstallerProject
+{
+
+
+    public partial class FrmExe1 : Form
+    {
+        public FrmExe1()
+        {
+            InitializeComponent();
+        }
+
+        public static string CreateShortcut()
+        {
+            string currentDirectory = @"C:\Camera\SaveImageToFile.exe";
+
+
+
+            // Dosya adını dizinle birleştir
+            string filePath = Path.Combine(currentDirectory, "");
+
+
+            string userName = Environment.UserName;
+            string exePath = currentDirectory;
+            string tempFolder = Path.GetTempPath(); // Geçici klasöre oluştur
+            string shortcutName = "SaveImageToFile.lnk";
+            string shortcutFullPath = Path.Combine(tempFolder, shortcutName);
+
+
+
+            try
+            {
+                if (!System.IO.File.Exists(exePath))
+                    throw new FileNotFoundException("EXE file is not found", exePath);
+
+                WshShell shell = new WshShell();
+                IWshShortcut shortcut = (IWshShortcut)shell.CreateShortcut(shortcutFullPath);
+                shortcut.TargetPath = exePath;
+                shortcut.WorkingDirectory = Path.GetDirectoryName(exePath);
+                shortcut.WindowStyle = 1;
+                shortcut.Description = "automotically start SaveImageToFile";
+                shortcut.Save();
+
+                return shortcutFullPath;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("shortcut couldnt be created:\n" + ex.Message , "Error" , MessageBoxButtons.OK,MessageBoxIcon.Warning);
+                return null;
+            }
+        }
+
+        
+
+        //public static void RunExeFiles()
+        //{
+        //    try
+        //    {
+
+        //        string basePath = AppDomain.CurrentDomain.BaseDirectory;
+        //        string iCentralexePath = Path.Combine(basePath, @"Setup\iCentral.exe");
+        //        string SentechexePath = Path.Combine(basePath, @"Setup\SentechSDK.exe");
+
+
+
+        //        // Start the processes
+        //        Process iCentraltProcess = Process.Start(new ProcessStartInfo
+        //        {
+        //            FileName = iCentralexePath,
+        //            UseShellExecute = true
+        //        });
+        //        iCentraltProcess?.WaitForExit();
+
+        //        // Start second process
+        //        Process SentechProcess = Process.Start(new ProcessStartInfo
+        //        {
+        //            FileName = SentechexePath,
+        //            UseShellExecute = true
+        //        });
+
+        //        SentechProcess?.WaitForExit();
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        MessageBox.Show("Error: " + ex.Message);
+        //    }
+        //}
+
+
+        public static void CopyItems()
+        {
+            string userName = Environment.UserName;
+            string basePath = AppDomain.CurrentDomain.BaseDirectory;
+            string folderPath = Path.Combine(basePath, "Setup");
+            MessageBox.Show($"Path: {folderPath}");
+
+            string sourceDirectory = folderPath;
+            string targetDirectory = @"C:\Camera";
+
+            // Create target directory if it doesn't exist
+            if (!Directory.Exists(targetDirectory))
+            {
+                Directory.CreateDirectory(targetDirectory);
+                Console.WriteLine("Directory has been created: " + targetDirectory);
+            }
+            else
+            {
+                Console.WriteLine("Directory is available: " + targetDirectory);
+            }
+
+            // Copy all files in the main Setup folder
+            string[] files = Directory.GetFiles(sourceDirectory);
+            foreach (string file in files)
+            {
+                string fileName = Path.GetFileName(file);
+                string destFile = Path.Combine(targetDirectory, fileName);
+                System.IO.File.Copy(file, destFile, overwrite: true);
+            }
+
+            // Copy the "config" folder and its contents
+            string configSourcePath = Path.Combine(sourceDirectory, "config");
+            string configTargetPath = Path.Combine(targetDirectory, "config");
+
+            if (Directory.Exists(configSourcePath))
+            {
+                CopyDirectory(configSourcePath, configTargetPath);
+                MessageBox.Show("Config folder copied", "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            else
+            {
+                MessageBox.Show("Config folder doesnt exist:\n", "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+
+            MessageBox.Show("All Files and folders copied successfully", "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
+        // Recursive directory copy
+        public static void CopyDirectory(string sourceDir, string targetDir)
+        {
+            Directory.CreateDirectory(targetDir);
+
+            foreach (string file in Directory.GetFiles(sourceDir))
+            {
+                string fileName = Path.GetFileName(file);
+                string destFile = Path.Combine(targetDir, fileName);
+                System.IO.File.Copy(file, destFile, true);
+            }
+
+            foreach (string subDir in Directory.GetDirectories(sourceDir))
+            {
+                string dirName = Path.GetFileName(subDir);
+                string targetSubDir = Path.Combine(targetDir, dirName);
+                CopyDirectory(subDir, targetSubDir);
+            }
+        }
+
+
+
+
+        public static void MoveExeToStartup()
+        {
+            string shortcutPath = CreateShortcut(); // .lnk dosyası yolu
+
+            if (string.IsNullOrEmpty(shortcutPath))
+                return;
+
+            string startupFolder = Environment.GetFolderPath(Environment.SpecialFolder.Startup);
+            string destinationPath = Path.Combine(startupFolder, Path.GetFileName(shortcutPath));
+
+            try
+            {
+                if (System.IO.File.Exists(destinationPath))
+                {
+                    MessageBox.Show("the exe is available in Startup directory.","Info",MessageBoxButtons.OK,MessageBoxIcon.Information);
+                    return;
+                }
+
+                System.IO.File.Move(shortcutPath, destinationPath); // Geçici klasörden taşı
+                MessageBox.Show("Shortcut moved successfully:\n" + destinationPath);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("an error occured while moving:\n" + ex.Message);
+            }
+        }
+
+
+
+
+        private void label1_Click(object sender, EventArgs e)
+        {
+
+        }
+
+
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+
+        }
+
+        private void progressBar1_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private async Task btnNext_ClickAsync(object sender, EventArgs e)
+        {
+            
+            await RunExeFiles.runCentralExeAsync();  // EXE kapanana kadar bekle
+
+            // EXE bittiğinde formu kapat ve diğer forma geç
+            this.Hide();
+
+            FrmExe2 frm = new FrmExe2(30);
+            frm.Show();
+        }
+
+
+
+        private async void btnNext_Click(object sender, EventArgs e)
+        {
+            await btnNext_ClickAsync(sender, e);
+        }
+    }
+
+    
+}
