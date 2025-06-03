@@ -36,7 +36,7 @@
             // 
             this.lblMessage.AutoSize = true;
             this.lblMessage.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
-            this.lblMessage.Location = new System.Drawing.Point(188, 124);
+            this.lblMessage.Location = new System.Drawing.Point(214, 126);
             this.lblMessage.Name = "lblMessage";
             this.lblMessage.Size = new System.Drawing.Size(85, 29);
             this.lblMessage.TabIndex = 0;
@@ -46,7 +46,7 @@
             // 
             this.btnClose.BackColor = System.Drawing.SystemColors.InactiveBorder;
             this.btnClose.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
-            this.btnClose.Location = new System.Drawing.Point(327, 258);
+            this.btnClose.Location = new System.Drawing.Point(353, 260);
             this.btnClose.Name = "btnClose";
             this.btnClose.Size = new System.Drawing.Size(209, 43);
             this.btnClose.TabIndex = 1;
